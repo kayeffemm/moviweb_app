@@ -32,6 +32,7 @@ class Movie(db.Model):
     - director
     - release_year
     - imdb_rating
+    - poster_url
     """
     __tablename__ = 'movie'
 

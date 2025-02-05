@@ -1,5 +1,4 @@
 from sqlalchemy.exc import SQLAlchemyError
-
 from datamanager.data_manager_interface import DataManager
 from datamanager.data_models import User, Movie
 
@@ -27,7 +26,7 @@ class SQLiteDataManager(DataManager):
             self.db.session.rollback()
             print(f"Error while retrieving users: {e}")
 
-    def get_all_movies(self):
+    def get_all_movies(self) -> list:
         """
         List all movies from the database
         :return: list of Movie objects
