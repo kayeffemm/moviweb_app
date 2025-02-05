@@ -19,12 +19,12 @@ class DataManager(ABC):
         pass
 
     @abstractmethod
-    def add_movie(self, user_id, name, director, year, rating):
+    def add_movie(self, user_id, title, director, release_year, imdb_rating):
         """Add a new movie to the database."""
         pass
 
     @abstractmethod
-    def update_movie(self, movie_id, name=None, director=None, year=None, rating=None):
+    def update_movie(self, movie_id, title=None, director=None, release_year=None, imdb_rating=None):
         """Update details of a specific movie."""
         pass
 

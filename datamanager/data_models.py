@@ -1,60 +1,49 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, Table
+from flask_sqlalchemy import SQLAlchemy
 
 
-class Base(DeclarativeBase):
-    pass
+db = SQLAlchemy()
 
+# Relational table to avoid a movie being added for each user
+movie_user_rel  = db.Table(
+    'movie_user_rel',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('movie_id', db.Integer, db.ForeignKey('movies.id'), primary_key=True)
+)
 
-class User(Base):
+class User(db.Model):
     """
-    Table for users with the following columns:
-    - id [Primary Key]
+    User Table with the following columns:
+    - id [PrimaryKey]
     - name
     """
-    __tablename__ = "user"
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False, autoincrement=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    __tablename__ = 'user'
 
-    movies: Mapped[list["Movie"]] = relationship(secondary="user_movie_association", back_populates="users")
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String, nullable=False)
+
+    movies = db.relationship('Movie', secondary=movie_user_rel, back_populates='users')
 
 
-class Movie(Base):
+class Movie(db.Model):
     """
-    Table for movies with the following columns:
-    - id [Primary Key]
+    Movie Table with the following columns:
+    - id [PrimaryKey]
     - title
+    - director
     - release_year
     - imdb_rating
-    - director_id [Foreign key]
     """
-    __tablename__ = "movie"
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False, autoincrement=True)
-    title: Mapped[str] = mapped_column(nullable=False)
-    release_year: Mapped[str] = mapped_column(nullable=False)
-    imdb_rating: Mapped[float] = mapped_column(nullable=False)
-    director_id: Mapped[int] = mapped_column(ForeignKey("director.id"), nullable=False)
+    __tablename__ = 'movie'
 
-    director: Mapped["Director"] = relationship(back_populates="movies")
-    users: Mapped[list["User"]] = relationship(secondary="user_movie_association", back_populates="movies")
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    title = db.Column(db.String, nullable=False)
+    director = db.Column(db.String, nullable=False)
+    release_year = db.Column(db.Integer, nullable=False)
+    imdb_rating = db.Column(db.Float, nullable=True)
 
-
-class Director(Base):
-    """
-    Table for directors with the following columns:
-    - id [Primary Key]
-    - name
-    """
-    __tablename__ = "director"
-    id: Mapped[int] = mapped_column(primary_key=True, nullable=False, autoincrement=True)
-    name: Mapped[str] = mapped_column(nullable=False)
-
-    movies: Mapped[list["Movie"]] = relationship(back_populates="director")
+    users = db.relationship('User', secondary=movie_user_rel, back_populates='movies')
 
 
-user_movie_association = Table(
-    "user_movie_association",
-    Base.metadata,
-    mapped_column("user_id", ForeignKey("user.id"), primary_key=True),
-    mapped_column("movie_id", ForeignKey("movie.id"), primary_key=True)
-)
+if __name__ == "__main__":
+    # for testing
+    pass
