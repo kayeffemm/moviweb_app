@@ -23,7 +23,7 @@ class DataManager(ABC):
         pass
 
     @abstractmethod
-    def add_movie_to_user(self, user_id, title, director, release_year, imdb_rating, poster_url):
+    def add_movie_to_user(self, user_id, title):
         """Add a new movie to the database."""
         pass
 

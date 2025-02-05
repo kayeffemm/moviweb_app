@@ -1,6 +1,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 from datamanager.data_manager_interface import DataManager
 from datamanager.data_models import User, Movie
+from omdb_api.omdb_api import request_movie_data
 
 
 class SQLiteDataManager(DataManager):
@@ -69,17 +70,13 @@ class SQLiteDataManager(DataManager):
             self.db.session.rollback()
             print(f"Error while trying to add a new user to database: {e}")
 
-    def add_movie_to_user(self, user_id, title, director, release_year, imdb_rating, poster_url) -> str:
+    def add_movie_to_user(self, user_id, title) -> str:
         """
         TODO: Implement omdb_api support
         Establishes connection between given user_id and movie. If movie does not exist creates Movie object and
         add it to the database.
         :param user_id: ID of the user we want to access
         :param title: movie title
-        :param director: movie director
-        :param release_year: movie release year
-        :param imdb_rating: movie imdb rating
-        :param poster_url: url of movie poster image
         :return: None
         """
         try:
@@ -96,12 +93,18 @@ class SQLiteDataManager(DataManager):
                 else:
                     return f"{title} already exists in your list of movies."
 
+            res = request_movie_data(title)
+            if isinstance(res, tuple) and len(res) == 5:
+                fetched_title, fetched_director, fetched_release_year, fetched_imdb_rating, fetched_poster_url = res
+            else:
+                return "Data is invalid"
+
             new_movie = Movie(
-                title = title,
-                director = director,
-                release_year = release_year,
-                imdb_rating = imdb_rating,
-                poster_url = poster_url
+                title = fetched_title,
+                director = fetched_director,
+                release_year = fetched_release_year,
+                imdb_rating = fetched_imdb_rating,
+                poster_url = fetched_poster_url
             )
             user.movies.append(new_movie)
             self.db.session.commit()

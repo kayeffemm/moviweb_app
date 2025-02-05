@@ -7,7 +7,7 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 
 
-def request_movie_data(title: str) -> tuple[str, str, str, str, str]|str:
+def request_movie_data(title: str) -> tuple[str, str, int, float, str]|str:
     """
     Fetches movie details from the OMDb API for the given title.
 
@@ -25,8 +25,8 @@ def request_movie_data(title: str) -> tuple[str, str, str, str, str]|str:
             if movie_details.get('Response') == 'True':
                 title = movie_details.get('Title', 'N/A')
                 director = movie_details.get('Director', 'N/A')
-                year = movie_details.get('Year', 'N/A')
-                imdb_rating = movie_details.get('imdbRating', 'N/A')
+                year = int(movie_details.get('Year', 0))
+                imdb_rating = float(movie_details.get('imdbRating', 0.0))
                 poster_url = movie_details.get('Poster', 'N/A')
 
                 return title, director, year, imdb_rating, poster_url
