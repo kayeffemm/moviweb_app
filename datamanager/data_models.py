@@ -16,7 +16,7 @@ class User(db.Model):
     - id [PrimaryKey]
     - name
     """
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
@@ -34,7 +34,7 @@ class Movie(db.Model):
     - imdb_rating
     - poster_url
     """
-    __tablename__ = 'movie'
+    __tablename__ = 'movies'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String, nullable=False)

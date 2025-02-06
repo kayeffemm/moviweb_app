@@ -51,20 +51,20 @@ class SQLiteDataManager(DataManager):
             raise ValueError(f"Theres no User with ID: {user_id}.")
         return user.movies
 
-    def add_user(self, name) -> str:
+    def add_user(self, new_username) -> str:
         """
         Create User object and add it to the database.
-        :param name: Name of the user
+        :param new_username: Name of the user
         :return: None
         """
-        if not isinstance(name, str):
-            raise TypeError(f"Argument name must be string, got {type(name)} instead.")
+        if not isinstance(new_username, str):
+            raise TypeError(f"Argument name must be string, got {type(new_username)} instead.")
 
         try:
-            new_user = User(name)
+            new_user = User(name=new_username)
             self.db.session.add(new_user)
             self.db.session.commit()
-            return f"{name} added as a new user."
+            return f"{new_username} added as a new user."
 
         except SQLAlchemyError as e:
             self.db.session.rollback()
