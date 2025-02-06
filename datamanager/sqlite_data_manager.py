@@ -5,19 +5,21 @@ from omdb_api.omdb_api import request_movie_data
 
 
 class SQLiteDataManager(DataManager):
-    """
-    SQLite Data Manager for CRUD operations on a sqlite file.
-    """
+    """Manages data persistence using SQLite for users and movies."""
     def __init__(self, db):
-        """
-        Setup SQLiteDataManager with given db
+        """Initializes the SQLiteDataManager with a SQLAlchemy database session.
+
+        Args:
+            db: A SQLAlchemy database session object.
         """
         self.db = db
 
     def get_all_users(self) -> list:
-        """
-        List all users from the database.
-        :return: list of User objects
+        """Retrieves all users from the database.
+
+        Returns:
+            A list of User objects.  Returns an empty list if no users are found.
+            Returns None and logs the error if a SQLAlchemyError occurs.
         """
         try:
             all_users_list = self.db.session.query(User).all()
@@ -28,10 +30,13 @@ class SQLiteDataManager(DataManager):
             print(f"Error while retrieving users: {e}")
 
     def get_user(self, user_id):
-        """
+        """Retrieves a specific user by ID.
 
-        :param user_id:
-        :return:
+        Args:
+            user_id: The ID of the user to retrieve.
+
+        Returns:
+            A User object if found, None otherwise. Returns "error" if there is a SQLAlchemyError.
         """
         try:
             user = self.db.session.query(User) \
@@ -45,9 +50,10 @@ class SQLiteDataManager(DataManager):
             print(f"Error while fetching User: {e}")
 
     def get_all_movies(self) -> list:
-        """
-        List all movies from the database
-        :return: list of Movie objects
+        """Retrieves all movies from the database.
+
+        Returns:
+            A list of Movie objects. Returns an empty list if no movies are found. Returns None if there is a SQLAlchemyError.
         """
         try:
             all_movies_list = self.db.session.query(Movie).all()
@@ -58,10 +64,14 @@ class SQLiteDataManager(DataManager):
             print(f"Error while retrieving movies: {e}")
 
     def get_user_movies(self, user_id) -> list:
-        """
-        List all movies related to given user_id
-        :param user_id: ID of the user we want to access
-        :return: list of Movie objects related to this user_id
+        """Retrieves all movies associated with a specific user.
+
+        Args:
+            user_id: The ID of the user.
+
+        Returns:
+            A list of Movie objects associated with the user. Raises a ValueError if the user is not found.
+            Returns an empty list if the user has no movies.
         """
         user = self.db.session.query(User).get(user_id)
         if not user:
@@ -69,10 +79,13 @@ class SQLiteDataManager(DataManager):
         return user.movies
 
     def get_movie(self, movie_id):
-        """
+        """Retrieves a specific movie by ID.
 
-        :param movie_id:
-        :return:
+        Args:
+            movie_id: The ID of the movie to retrieve.
+
+        Returns:
+            A Movie object if found, None otherwise. Returns "error" if there is a SQLAlchemyError.
         """
         try:
             movie = self.db.session.query(Movie) \
@@ -86,10 +99,15 @@ class SQLiteDataManager(DataManager):
             print(f"Error while fetching movie: {e}")
 
     def add_user(self, new_username) -> str:
-        """
-        Create User object and add it to the database.
-        :param new_username: Name of the user
-        :return: None
+        """Adds a new user to the database.
+
+        Args:
+            new_username: The username of the new user.
+
+        Returns:
+            A string message confirming user creation.
+        Raises:
+            TypeError: If new_username is not a string.
         """
         if not isinstance(new_username, str):
             raise TypeError(f"Argument name must be string, got {type(new_username)} instead.")
@@ -105,13 +123,18 @@ class SQLiteDataManager(DataManager):
             print(f"Error while trying to add a new user to database: {e}")
 
     def add_movie_to_user(self, user_id, title) -> str:
-        """
-        TODO: Implement omdb_api support
-        Establishes connection between given user_id and movie. If movie does not exist creates Movie object and
-        add it to the database.
-        :param user_id: ID of the user we want to access
-        :param title: movie title
-        :return: None
+        """Adds a movie to a user's collection.
+
+        Retrieves movie data from the OMDb API if the movie doesn't exist in the database.
+
+        Args:
+            user_id: The ID of the user.
+            title: The title of the movie.
+
+        Returns:
+            A string message confirming the action.  Returns an error message if there is an error.
+        Raises:
+            ValueError: If the user is not found.
         """
         try:
             user = self.db.session.query(User).get(user_id)
@@ -153,16 +176,24 @@ class SQLiteDataManager(DataManager):
             print(f"Error while trying to add a new movie to database: {e}")
 
     def update_movie(self, user_id, movie_id, title=None, director=None, release_year=None, imdb_rating=None) -> str:
-        """
-        Used to overwrite existing movie details. Creates a new movie entry to prevent movie details being
-        edited for all users. If no other user has the old movie in their collection remove it also.
-        :param user_id: ID of user where movie gets updated
-        :param movie_id: ID of movie to update
-        :param title: New title used for update
-        :param director: New director used for update
-        :param release_year: New release year used for update
-        :param imdb_rating: New imdb_rating used for update
-        :return: String, status message
+        """Updates movie details for a user.
+
+        Creates a new movie entry to prevent details from being edited for all users.
+        If no other user has the old movie in their collection, it is also removed.
+
+        Args:
+            user_id: ID of the user whose movie is updated.
+            movie_id: ID of the movie to update.
+            title: New title (optional).
+            director: New director (optional).
+            release_year: New release year (optional).
+            imdb_rating: New rating (optional).
+
+        Returns:
+            A string message confirming the update.
+        Raises:
+            ValueError: If the movie or user is not found.
+            TypeError: If the provided title or director are not strings.
         """
         try:
             movie = self.db.session.query(Movie).get(movie_id)
@@ -216,11 +247,18 @@ class SQLiteDataManager(DataManager):
             print(e)
 
     def remove_movie_from_user(self, movie_id, user_id):
-        """
+        """Removes a movie from a user's collection.
 
-        :param movie_id:
-        :param user_id:
-        :return:
+        If the movie is no longer associated with any user, it is also deleted from the database.
+
+        Args:
+            movie_id: The ID of the movie to remove.
+            user_id: The ID of the user from whose collection the movie is removed.
+
+        Returns:
+            A string message confirming the removal.
+        Raises:
+            ValueError: If the movie or user is not found.
         """
         try:
             movie = self.db.session.query(Movie).get(movie_id)
@@ -246,11 +284,19 @@ class SQLiteDataManager(DataManager):
             print(f"Error while removing movie: {e}")
 
     def delete_movie(self, movie_id, user_id) -> str:
-        """
-        Delete a movie from user_id collection. If no user left with movie -> also delete the movie from database.
-        :param movie_id: Integer, id of movie to delete
-        :param user_id: Integer, id of user
-        :return: String, status message.
+        """Deletes a movie from a user's collection and potentially from the database.
+
+        Removes the movie from the specified user's collection. If no users are left
+        associated with the movie, the movie entry is also deleted from the database.
+
+        Args:
+            movie_id: The ID of the movie to delete.
+            user_id: The ID of the user.
+
+        Returns:
+            A string message confirming the removal.
+        Raises:
+            ValueError: If the movie or user is not found.
         """
         try:
             movie = self.db.session.query(Movie).get(movie_id)
