@@ -27,6 +27,23 @@ class SQLiteDataManager(DataManager):
             self.db.session.rollback()
             print(f"Error while retrieving users: {e}")
 
+    def get_user(self, user_id):
+        """
+
+        :param user_id:
+        :return:
+        """
+        try:
+            user = self.db.session.query(User) \
+            .filter(User.id == user_id).first()
+            if not user:
+                return "error"
+            return user
+
+        except SQLAlchemyError as e:
+            self.db.session.rollback()
+            print(f"Error while fetching User: {e}")
+
     def get_all_movies(self) -> list:
         """
         List all movies from the database
@@ -50,6 +67,23 @@ class SQLiteDataManager(DataManager):
         if not user:
             raise ValueError(f"Theres no User with ID: {user_id}.")
         return user.movies
+
+    def get_movie(self, movie_id):
+        """
+
+        :param movie_id:
+        :return:
+        """
+        try:
+            movie = self.db.session.query(Movie) \
+            .filter(Movie.id == movie_id).first()
+            if not movie:
+                return "error"
+            return movie
+
+        except SQLAlchemyError as e:
+            self.db.session.rollback()
+            print(f"Error while fetching movie: {e}")
 
     def add_user(self, new_username) -> str:
         """
@@ -180,6 +214,36 @@ class SQLiteDataManager(DataManager):
         except SQLAlchemyError as e:
             self.db.session.rollback()
             print(e)
+
+    def remove_movie_from_user(self, movie_id, user_id):
+        """
+
+        :param movie_id:
+        :param user_id:
+        :return:
+        """
+        try:
+            movie = self.db.session.query(Movie).get(movie_id)
+            if not movie:
+                raise ValueError(f"Movie with ID {movie_id} not found.")
+            user = self.db.session.query(User).get(user_id)
+            if not user:
+                raise ValueError(f"User with ID {user_id} not found.")
+
+            if movie in user.movies:
+                user.movies.remove(movie)
+                self.db.session.commit()
+            if len(movie.users) == 0:
+                self.db.session.delete(movie)
+                self.db.session.commit()
+            return f"Successfully removed '{movie.title}' from your list."
+
+        except ValueError as e:
+            self.db.session.rollback()
+            print(e)
+        except SQLAlchemyError as e:
+            self.db.session.rollback()
+            print(f"Error while removing movie: {e}")
 
     def delete_movie(self, movie_id, user_id) -> str:
         """
