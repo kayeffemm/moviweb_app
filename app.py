@@ -205,8 +205,8 @@ def internal_server_error(e):
 if __name__ == "__main__":
     configure_app(app)
 
-    db_path = os.path.join(os.path.dirname(__file__), "data", "movieweb_db.sqlite")
-    if not os.path.exists(db_path):
-        create_database(app, db)
+    #db_path = os.path.join(os.path.dirname(__file__), "data", "movieweb_db.sqlite")
+    #if not os.path.exists(db_path):
+    #    create_database(app, db)
 
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
