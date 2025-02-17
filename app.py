@@ -23,6 +23,7 @@ def configure_app(app):
         'DATABASE_URI', f'sqlite:///{os.path.join(current_directory, "data", "movieweb_db.sqlite")}'
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
 
 
 def create_database(app, db):
@@ -204,7 +205,7 @@ def internal_server_error(e):
 if __name__ == "__main__":
     configure_app(app)
 
-    db_path = os.path.join(os.path.dirname(__file__), "data", "movieweb_db.sqliite")
+    db_path = os.path.join(os.path.dirname(__file__), "data", "movieweb_db.sqlite")
     if not os.path.exists(db_path):
         create_database(app, db)
 
