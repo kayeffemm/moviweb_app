@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - MovieWeb App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-300 flex flex-col items-center min-h-screen p-4">
+    <div class="w-full max-w-2xl bg-gray-800 p-6 rounded-lg shadow-md">
+        <h1 class="text-3xl font-bold text-gray-100 mb-4">Users</h1>
+        <ul class="list-disc pl-6 mb-6">
+            {% for user in users %}
+                <li class="mb-2">
+                    <a href="{{ url_for('list_user_movies', user_id=user.id) }}" class="text-blue-400 hover:underline">
+                        {{ user.name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="mt-8">
+            <a href="{{ url_for('add_user') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Add New User
+            </a>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ url_for('home') }}" class="text-blue-400 hover:underline">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

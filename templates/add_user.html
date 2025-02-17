@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add User - MovieWeb App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-300 flex items-center justify-center h-screen">
+    <div class="p-6 bg-gray-800 rounded-lg shadow-lg w-96">
+        <h1 class="text-2xl font-bold">Add New User</h1>
+        {% if user_used %}
+            <p class="mt-2 text-red-400">{{ user_used }}</p>
+        {% endif %}
+        <form action="{{ url_for('add_user') }}" method="POST" class="mt-4">
+            <label for="username" class="block text-sm">User name:</label>
+            <input type="text" id="username" name="username" required class="w-full p-2 rounded bg-gray-700 text-white">
+            <input type="submit" value="Create user" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded cursor-pointer">
+        </form>
+        <a href="{{ url_for('list_users') }}" class="block mt-4 text-blue-400 hover:underline">Back to Users</a>
+    </div>
+</body>
+</html>

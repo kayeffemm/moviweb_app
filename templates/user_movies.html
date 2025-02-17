@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Favourites - MovieWeb App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-300 flex flex-col items-center min-h-screen p-4">
+    <div class="w-full max-w-4xl bg-gray-800 p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-gray-100">{{ user.name }}'s Movie Favourites</h1>
+        {% if action_result %}
+            <p class="text-green-400 mt-2">{{ action_result }}</p>
+        {% endif %}
+        <div class="mt-4">
+            <a href="{{ url_for('add_movie_to_user', user_id=user.id) }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Add New Movie
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+            {% for movie in user_movies %}
+                <div class="bg-gray-700 p-4 rounded-lg shadow-md">
+                    <img src="{{ movie.poster_url }}" alt="Poster for {{ movie.title }}" class="w-full rounded-lg">
+                    <h3 class="text-lg font-semibold mt-2">{{ movie.title }}</h3>
+                    <p class="text-gray-400">{{ movie.director }} ({{ movie.release_year }})</p>
+                    <p class="text-yellow-400">
+                        {% if movie.imdb_rating %}
+                            {{ movie.imdb_rating }}/10
+                        {% else %}
+                            No rating available
+                        {% endif %}
+                    </p>
+                    <div class="flex justify-between mt-4">
+                        <form method="POST" action="{{ url_for('remove_movie_from_user', user_id=user.id, movie_id=movie.id) }}">
+                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">
+                                Delete
+                            </button>
+                        </form>
+                        <form method="GET" action="{{ url_for('update_movie', user_id=user.id, movie_id=movie.id) }}">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-1 px-3 rounded">
+                                Update
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-6 flex justify-between">
+            <a href="{{ url_for('home') }}" class="text-blue-400 hover:underline">Home</a>
+            <a href="{{ url_for('list_users') }}" class="text-blue-400 hover:underline">Back to Users</a>
+        </div>
+    </div>
+</body>
+</html>
